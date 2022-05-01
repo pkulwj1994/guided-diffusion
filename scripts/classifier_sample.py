@@ -34,7 +34,7 @@ def main():
         **args_to_dict(args, model_and_diffusion_defaults().keys())
     )
     model.load_state_dict(
-        dist_util.load_state_dict(args.model_path, map_location="cpu")
+        dist_util.load_state_dict(args.model_path, map_location="cuda")
     )
     model.to(dist_util.dev())
     if args.use_fp16:
@@ -44,7 +44,7 @@ def main():
     logger.log("loading classifier...")
     classifier = create_classifier(**args_to_dict(args, classifier_defaults().keys()))
     classifier.load_state_dict(
-        dist_util.load_state_dict(args.classifier_path, map_location="cpu")
+        dist_util.load_state_dict(args.classifier_path, map_location="cuda")
     )
     classifier.to(dist_util.dev())
     if args.classifier_use_fp16:
