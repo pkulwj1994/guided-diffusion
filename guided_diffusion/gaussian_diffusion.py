@@ -401,6 +401,7 @@ class GaussianDiffusion:
         denoised_fn=None,
         cond_fn=None,
         model_kwargs=None,
+        cond_end_t=-1,
     ):
         """
         Sample x_{t-1} from the model at the given timestep.
@@ -431,7 +432,7 @@ class GaussianDiffusion:
         nonzero_mask = (
             (t != 0).float().view(-1, *([1] * (len(x.shape) - 1)))
         )  # no noise when t == 0
-        if cond_fn is not None:
+        if cond_fn is not None and t[0].item()>cond_end_t:
             out["mean"] = self.condition_mean(
                 cond_fn, out, x, t, model_kwargs=model_kwargs
             )
@@ -449,6 +450,7 @@ class GaussianDiffusion:
         model_kwargs=None,
         device=None,
         progress=False,
+        cond_end_t=-1,
     ):
         """
         Generate samples from the model.
@@ -480,6 +482,7 @@ class GaussianDiffusion:
             model_kwargs=model_kwargs,
             device=device,
             progress=progress,
+            cond_end_t=cond_end_t,
         ):
             final = sample
         return final["sample"]
@@ -495,6 +498,7 @@ class GaussianDiffusion:
         model_kwargs=None,
         device=None,
         progress=False,
+        cond_end_t=-1,
     ):
         """
         Generate samples from the model and yield intermediate samples from
@@ -530,6 +534,7 @@ class GaussianDiffusion:
                     denoised_fn=denoised_fn,
                     cond_fn=cond_fn,
                     model_kwargs=model_kwargs,
+                    cond_end_t=cond_end_t,
                 )
                 yield out
                 img = out["sample"]
